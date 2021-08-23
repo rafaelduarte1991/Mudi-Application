@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head th:replace="~{base :: head}">
+
+<title>form</title>
+
+</head>
+
+<body> 
+	<div th:replace="~{base :: logo}"></div> 
+		
+<div class="container">
+
+	<div th:replace="~{base :: title('New Order')}"></div>
+	
+	
+	<div class="card mt-3">
+	<form th:action="@{/order/new}" th:object="${newOrderRequest}" class="card-body" action="/order/new" method="POST">
+		<div class="form-group mt-3"> 
+			 <label for="productName">Product</label>
+			 <input th:field="*{productName}" th:errorclass="is-invalid" class="form-control" placeholder="product name"/>
+			 <small>Type the product name</small>
+			 <div class="invalid-feedback" td:errors="*{productName}">
+			 This field can`t be empty.
+			 </div>			 
+		</div>
+		<div class="form-group mt-3">
+			 <label>URL</label>
+			 <input th:field="*{urlProduct}" th:errorclass="is-invalid" class="form-control" placeholder="product url"/>
+			 <small>Search the product you want and post the url here</small>
+			 <div class="invalid-feedback" td:errors="*{urlProduct}">
+			 This field can`t be empty.
+			 </div>			 
+		</div>
+		<div class="form-group mt-3">
+			 <label>Image</label>
+			 <input th:field="*{urlImage}" th:errorclass="is-invalid" class="form-control" placeholder="Image url"/>
+			 <small>Search the product you want and post the image url here</small>
+			 <div class="invalid-feedback" td:errors="*{urlImage}">
+			 This field can`t be empty.
+			 </div>			 
+		</div>
+		<div class="form-group mt-3 mb-4">
+			 <label>Description</label>
+			 <textarea th:field="*{description}" class="form-control" placeholder="Write the product description here"></textarea>
+		</div> 
+		
+		<button class="btn btn-primary" type="submit">Register</button>
+	</form>
+	</div>
+</div>
+	  
+</body>
+</html>

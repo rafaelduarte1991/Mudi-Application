@@ -1,0 +1,109 @@
+<html>
+
+<head th:replace="~{base :: head}"></head>
+
+<body onload="onLoad()">
+	
+	<div th:replace="~{base :: logo}"></div> 
+
+	<div class="container" id="offers">
+	
+	<div th:replace="~{base :: title('Make An Offer')}"></div>
+	
+	
+	<div class="card mb-3" v-for="order in orders">
+				
+		<div class="card-header alert-dark">{{order.productName}}</div>
+		
+		   <div class="card-body">
+		      <div class="row">
+		        <div class="col-12 col-sm-8 mb-3"> 		        	
+		       
+					<div>Product</div>
+					<div><a v-bind:href="order.urlProduct">{{order.productName}}</a></div>
+					
+					<div class="mt-4">Description</div>					
+					<div class="mt-2">
+						<textarea disabled="disabled" class="form-control">{{order.description}}</textarea>
+					</div>
+					 <div class="row mt-5 mb-4">
+						<div class="col-md-5">
+							Price: <input v-bind:class="{'is-invalid':order.errors.price !==''}" class="form-control" v-model="order.price"/>							
+							<div v-if="order.errors.price" class="invalid-feedback">
+								You should fill this field with a value in this format (xxx.xx).
+							</div> 
+						</div>
+						<div class="col-md-7">
+								Delivery Date: <input v-bind:class="{'is-invalid':order.errors.deliveryDate !==''}" class="form-control" v-model="order.deliveryDate"/>
+								<div v-if="order.errors.deliveryDate" class="invalid-feedback">
+									You should fill this field with a value in this format (MM/dd/yyyy)
+								</div>
+						</div>
+					</div>
+					<div class="mt-2">
+						<label>Comment</label>
+						<textarea class="form-control" v-model="order.comment"></textarea>
+					</div>
+						<button v-if="order.offerSent" class="btn btn-success mt-2">Offer sent</button>
+						<button v-else v-on:click="createOffer(order)" class="btn btn-primary mt-2">Send Offer</button>
+			     </div>
+			     
+			   <div class="col-12 col-sm-4">
+			     <div>
+				    <img class="img-thumbnail" v-bind:src="order.urlImage"/>
+			     </div>
+			   </div>
+		 </div>
+	    </div>
+	   </div>
+	 </div>
+	 <script>
+		 function onLoad() {
+			 var app = new Vue({
+				  el: '#offers',
+				  data: {
+				    orders: []				    	
+				  },
+				  mounted(){
+					axios
+				      .get('http://localhost:8080/api/orders/pending')
+				      .then(response => {
+				      		response.data.forEach(order =>{
+				      			order.offerSent = false;
+				      			order.errors = {
+				      				price: '',
+				      				deliveryDate: ''
+				      			}
+				      		}) 
+				      		this.orders = response.data
+				      		})
+				      		
+				  },
+				  methods: {
+					  createOffer: function(order) {
+						  order.errors = {
+				      				price: '',
+				      				deliveryDate: ''
+				      			}
+						  axios
+					      .post('http://localhost:8080/api/offers', {
+					    	  orderId: order.id,
+					    	  price: order.price,
+					          deliveryDate: order.deliveryDate,
+					    	  comment: order.comment
+					      })
+					      .then(response => order.offerSent, true)
+					      .catch(error => {
+					    	  error.response.data.errors.forEach(error => {
+					    		  order.errors[error.field] = error.defaultMessage; 
+					    	  })
+					      })					      
+					}
+				  }
+				})
+			 }
+	 </script>
+	 <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+	 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</body>
+</html>
